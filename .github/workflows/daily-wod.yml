@@ -1,0 +1,33 @@
+name: Notion WOD Watchdog
+
+on:
+  schedule:
+    # Independent backup scheduler. Checks every 15 minutes from 06:07 to 12:52 KST.
+    # The generator exits without creating a duplicate when today's WOD already exists.
+    - cron: "7,22,37,52 6-12 * * *"
+      timezone: "Asia/Seoul"
+  workflow_dispatch:
+
+concurrency:
+  group: daily-notion-wod
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ensure-wod-exists:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Ensure today's WOD exists in Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ vars.NOTION_DATABASE_ID }}
+        run: node scripts/create-daily-wod.mjs
