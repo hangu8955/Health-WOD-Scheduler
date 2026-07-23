@@ -2,10 +2,11 @@ name: Notion WOD Watchdog
 
 on:
   schedule:
-    # Independent backup scheduler. Checks every 15 minutes from 06:07 to 12:52 KST.
+    # UTC schedules equivalent to checks every 15 minutes from 06:07 to 12:52 KST.
+    # Splitting the UTC range avoids relying on GitHub's timezone schedule extension.
     # The generator exits without creating a duplicate when today's WOD already exists.
-    - cron: "7,22,37,52 6-12 * * *"
-      timezone: "Asia/Seoul"
+    - cron: "7,22,37,52 21-23 * * *"
+    - cron: "7,22,37,52 0-3 * * *"
   workflow_dispatch:
 
 concurrency:
